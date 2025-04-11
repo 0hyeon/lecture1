@@ -7,7 +7,7 @@ spec:
     matchLabels:
       app: category-match
   serviceName: category-match
-  replicas: 1
+  replicas: 1  # 필요에 따라 이 숫자를 변경하여 오토스케일링이 가능하도록 설정
   template:
     metadata:
       labels:
@@ -15,10 +15,10 @@ spec:
     spec:
       containers:
         - name: main
-          image: byeongjokim/worker:0.1.0
+          image: 0hyeon/fastapi-server:0.0.1  # 자신의 Docker 이미지를 사용
           command: ['/bin/bash', '-c']
           args:
-            - git clone https://github.com/byeongjokim/fast-campus-lecture &&
+            - git clone https://github.com/0hyeon/fast-campus-lecture &&
               cd fast-campus-lecture/lecture_1/deploy/worker/src &&
               python main.py
           volumeMounts:
@@ -28,3 +28,16 @@ spec:
       - name: nfs-volume
         persistentVolumeClaim:
           claimName: nfs-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: category-match
+spec:
+  selector:
+    app: category-match
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000  # FastAPI가 사용하는 포트
+  type: ClusterIP  # 내부 서비스로만 접근 가능하게 설정, 필요에 따라 LoadBalancer로 변경 가능

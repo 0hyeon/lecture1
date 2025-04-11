@@ -1,6 +1,6 @@
-# docker build --platform linux/amd64 -t fastapi-server:0.0.1 .
-# docker tag fastapi-server:0.0.1 0hyeon/fastapi-server:0.0.1
-# docker push 0hyeon/fastapi-server:0.0.1
+# docker build --platform linux/amd64 -t fastapi-server:0.0.2 .
+# docker tag fastapi-server:0.0.2 0hyeon/fastapi-server:0.0.2
+# docker push 0hyeon/fastapi-server:0.0.2
 
 # FastAPI 애플리케이션을 위한 Python 베이스 이미지
 FROM python:3.10-slim

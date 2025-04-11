@@ -1,43 +1,26 @@
-apiVersion: apps/v1
-kind: StatefulSet
+apiVersion: serving.knative.dev/v1
+kind: Service
 metadata:
   name: category-match
 spec:
-  selector:
-    matchLabels:
-      app: category-match
-  serviceName: category-match
-  replicas: 1  # 필요에 따라 이 숫자를 변경하여 오토스케일링이 가능하도록 설정
   template:
-    metadata:
-      labels:
-        app: category-match
     spec:
       containers:
         - name: main
-          image: 0hyeon/fastapi-server:0.0.1  # 자신의 Docker 이미지를 사용
+          image: 0hyeon/fastapi-server:0.0.2  # 자신의 Docker 이미지를 사용
           command: ['/bin/bash', '-c']
           args:
             - git clone https://github.com/0hyeon/fast-campus-lecture &&
               cd fast-campus-lecture/lecture_1/deploy/worker/src &&
               python main.py
           volumeMounts:
-          - name: nfs-volume
-            mountPath: /data
+            - name: nfs-volume
+              mountPath: /data
       volumes:
-      - name: nfs-volume
-        persistentVolumeClaim:
-          claimName: nfs-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: category-match
-spec:
-  selector:
-    app: category-match
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8000  # FastAPI가 사용하는 포트
-  type: ClusterIP  # 내부 서비스로만 접근 가능하게 설정, 필요에 따라 LoadBalancer로 변경 가능
+        - name: nfs-volume
+          persistentVolumeClaim:
+            claimName: nfs-pvc
+  # 여기서 autoscaling을 설정할 수 있습니다
+  autoscaling:
+    minScale: 1  # 최소 1개의 인스턴스를 유지
+    maxScale: 50  # 최대 5개의 인스턴스로 오토스케일링
